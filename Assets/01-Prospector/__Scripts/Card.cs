@@ -17,7 +17,60 @@ public class Card : MonoBehaviour {
 	public CardDefinition def;  // from DeckXML.xml		
 
 
-	public bool faceUp {
+	public SpriteRenderer[] spriteRenderers;
+
+
+    void Start()
+    {
+		SetSortOrder(0);
+
+    }
+
+	public void PopulateSpriteRenderers()
+	{
+		if(spriteRenderers == null || spriteRenderers.Length == 0)
+		{
+			spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
+		}
+	}
+
+	public void SetSortingLayerName(string tSLN)
+	{
+		PopulateSpriteRenderers();
+
+		foreach(SpriteRenderer tSR in spriteRenderers)
+		{
+			tSR.sortingLayerName = tSLN;
+		}
+	}
+
+	public void SetSortingOrder(int s0rd)
+	{
+		PopulateSpriteRenderers();
+
+		foreach(SpriteRenderer tSR in spriteRenderers)
+		{
+			if(tSR.gameObject == this.gameObject)
+			{
+				tSR.sortingOrder = s0rd;
+				continue;//unclear as to why this is needed
+			}
+			switch (tSR.gameObject.name)
+			{
+				case "back":
+					tSR.sortingOrder = s0rd + 2;
+					break;
+
+				case "face": // if name is face
+				default: // or anything else
+					tSR.sortingOrder= s0rd + 1;
+					break;
+
+			}
+		}
+	}
+
+    public bool faceUp {
 		get {
 			return (!back.activeSelf);
 		}
@@ -28,10 +81,7 @@ public class Card : MonoBehaviour {
 	}
 
 
-	// Use this for initialization
-	void Start () {
-	
-	}
+
 	
 	// Update is called once per frame
 	void Update () {

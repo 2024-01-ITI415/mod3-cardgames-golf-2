@@ -92,6 +92,7 @@ public class Prospector : MonoBehaviour {
 			cp.slotDef = tSD;
 			//cards in tableau should have the cardstate tableau
 			cp.state = eCardState.tableau;
+			cp.SetSortingLayerName(tSD.layerName);
 			tableau.Add(cp);
 
 		}
