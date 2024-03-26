@@ -44,7 +44,7 @@ public class Card : MonoBehaviour {
 		}
 	}
 
-	public void SetSortingOrder(int s0rd)
+	public void SetSortOrder(int s0rd)
 	{
 		PopulateSpriteRenderers();
 
@@ -70,6 +70,7 @@ public class Card : MonoBehaviour {
 		}
 	}
 
+
     public bool faceUp {
 		get {
 			return (!back.activeSelf);
@@ -80,7 +81,10 @@ public class Card : MonoBehaviour {
 		}
 	}
 
-
+	virtual public void OnMouseUpAsButton()
+	{
+		print(name);
+	}
 
 	
 	// Update is called once per frame
