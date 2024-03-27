@@ -16,9 +16,12 @@ public class Prospector : MonoBehaviour {
 	public float				xOffset = 3;
 	public float				yOffset = -2.5f; //why is this f but x isnt?
 	public Vector3				layoutCenter;
+	public Vector2				fsPosMid = new Vector2(0.5f, 0.90f);
+    public Vector2				fsPosRun = new Vector2(0.5f, 0.75f);
+    public Vector2				fsPosMid2 = new Vector2(0.4f, 1.0f);
+    public Vector2				fsPosEnd = new Vector2(0.5f, 0.95f);
 
-
-	[Header("Set Dynamically")]
+    [Header("Set Dynamically")]
 	public Deck					deck;
 	public Layout				layout;
 	public List<CardProspector> drawPile;
@@ -26,12 +29,15 @@ public class Prospector : MonoBehaviour {
 	public CardProspector		target;
 	public List<CardProspector> tableau;
 	public List<CardProspector> discardPile;
+	public FloatingScore		fsRun;
 
 	void Awake(){
 		S = this;
 	}
 
 	void Start() {
+		Scoreboard.S.score = ScoreManager.SCORE;
+
 		deck = GetComponent<Deck> ();
 		deck.InitDeck (deckXML.text);
 		Deck.Shuffle(ref deck.cards);
@@ -208,6 +214,7 @@ public class Prospector : MonoBehaviour {
 				MoveToTarget(Draw());
 				UpdateDrawPile();
 				ScoreManager.EVENT(eScoreEvent.draw);
+				FloatingScoreHandler(eScoreEvent.draw);
 				break;
 
 			case eCardState.tableau:
@@ -226,7 +233,8 @@ public class Prospector : MonoBehaviour {
 				MoveToTarget(cd);
 				SetTableauFaces();
 				ScoreManager.EVENT(eScoreEvent.mine);
-				break;
+                FloatingScoreHandler(eScoreEvent.mine);
+                break;
 		}
 
 		CheckForGameOver();
@@ -265,11 +273,13 @@ public class Prospector : MonoBehaviour {
 		{
 			//print("GameOver. You Won! :)");
 			ScoreManager.EVENT(eScoreEvent.gameWin);
-		} else
+            FloatingScoreHandler(eScoreEvent.gameWin);
+        } else
 		{
 			//print("Gameover. You Lost! :(");
 			ScoreManager.EVENT(eScoreEvent.gameLoss);
-		}
+            FloatingScoreHandler(eScoreEvent.gameLoss);
+        }
 
 		//reload scene
 		SceneManager.LoadScene("__Prospector");
@@ -288,5 +298,56 @@ public class Prospector : MonoBehaviour {
 
 		return(false);
     }
+
+	//handles FloatingScore movement
+	void FloatingScoreHandler(eScoreEvent evt)
+	{
+		List<Vector2> fsPts;
+		switch (evt)
+		{
+			//same thing happens whether draw, win, or loss
+			case eScoreEvent.draw:
+			case eScoreEvent.gameWin:
+			case eScoreEvent.gameLoss:
+				//add fsRun
+				if(fsRun != null)
+				{
+					//create points for bezier curve
+					fsPts = new List<Vector2>();
+					fsPts.Add(fsPosRun);
+					fsPts.Add(fsPosMid2);
+					fsPts.Add(fsPosEnd);
+					fsRun.reportFinishTo = Scoreboard.S.gameObject;
+					fsRun.Init(fsPts, 0, 1);
+					//adjust font size
+					fsRun.fontSizes = new List<float>(new float[] { 28, 26, 4 });
+					fsRun = null; //clear os that it can be recreated
+				}
+				break;
+
+			case eScoreEvent.mine:
+				FloatingScore fs;
+				//move from mousee to fsPosRun
+				Vector2 p0 = Input.mousePosition;
+				p0.x /= Screen.width;
+				p0.y /= Screen.height;
+				fsPts = new List<Vector2>();
+				fsPts.Add(p0);
+				fsPts.Add(fsPosMid);
+				fsPts.Add(fsPosRun);
+				fs = Scoreboard.S.CreateFloatingScore(ScoreManager.CHAIN, fsPts);
+				fs.fontSizes = new List<float>(new float[] { 4, 50, 28 });
+				if(fsRun == null)
+				{
+					fsRun = fs;
+					fsRun.reportFinishTo = null;
+				}
+				else
+				{
+					fs.reportFinishTo = fsRun.gameObject;
+				}
+				break;
+		}
+	}
 
 }
