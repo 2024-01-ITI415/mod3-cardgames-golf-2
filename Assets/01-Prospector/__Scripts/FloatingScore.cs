@@ -41,7 +41,7 @@ public class FloatingScore : MonoBehaviour
     public List<float> fontSizes;
     public float timeStart = -1f;
     public float timeDuration = 1f;
-    public string easingCurve = Easing.Out;
+    public string easingCurve = Easing.InOut;
 
     //will receive SendMessage when done moving
     public GameObject reportFinishTo = null;
@@ -107,7 +107,7 @@ public class FloatingScore : MonoBehaviour
                 else
                 {
                     //if nothing to callback, let it sit
-                    state = eFSState.active;
+                    state = eFSState.idle;
                 }
             }
             else

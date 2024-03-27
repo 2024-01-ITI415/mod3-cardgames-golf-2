@@ -320,7 +320,7 @@ public class Prospector : MonoBehaviour {
 					fsRun.reportFinishTo = Scoreboard.S.gameObject;
 					fsRun.Init(fsPts, 0, 1);
 					//adjust font size
-					fsRun.fontSizes = new List<float>(new float[] { 28, 26, 4 });
+					fsRun.fontSizes = new List<float>(new float[] { 28, 36, 4 });
 					fsRun = null; //clear os that it can be recreated
 				}
 				break;
