@@ -36,7 +36,8 @@ public class Prospector : MonoBehaviour {
 	}
 
 	void Start() {
-		Scoreboard.S.score = ScoreManager.SCORE;
+		//Scoreboard.S.score = ScoreManager.SCORE; This line completely removes deck generation,
+		//keep commented out for now!
 
 		deck = GetComponent<Deck> ();
 		deck.InitDeck (deckXML.text);
