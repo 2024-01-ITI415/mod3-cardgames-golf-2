@@ -20,6 +20,8 @@ public class Prospector : MonoBehaviour {
     public Vector2				fsPosRun = new Vector2(0.5f, 0.75f);
     public Vector2				fsPosMid2 = new Vector2(0.4f, 1.0f);
     public Vector2				fsPosEnd = new Vector2(0.5f, 0.95f);
+	public float				reloadDelay = 2f;
+	public Text					gameOverText, roundResultText, highScoreText;
 
     [Header("Set Dynamically")]
 	public Deck					deck;
@@ -33,11 +35,45 @@ public class Prospector : MonoBehaviour {
 
 	void Awake(){
 		S = this;
+		SetUPUITexts();
+	}
+
+	void SetUPUITexts()
+	{
+		//set up Highscore UI
+		GameObject go = GameObject.Find("HighScore");
+		if (go != null)
+		{
+			highScoreText = go.GetComponent<Text>();
+		}
+		int highScore = ScoreManager.HIGH_SCORE;
+		string hScore = "High Score:" + Utils.AddCommasToNumber(highScore);
+		go.GetComponent<Text>().text = hScore;
+
+		//setup end round UI
+		go = GameObject.Find("GameOver");
+		if(go != null)
+		{
+			gameOverText = go.GetComponent<Text>();
+		}
+
+		go = GameObject.Find("RoundResult");
+		if((go != null))
+		{
+			roundResultText = go.GetComponent<Text>();
+		}
+
+		ShowResultsUI(false);
+	}
+
+	void ShowResultsUI(bool show)
+	{
+		gameOverText.gameObject.SetActive(show);
+		roundResultText.gameObject.SetActive(show);
 	}
 
 	void Start() {
-		//Scoreboard.S.score = ScoreManager.SCORE; This line completely removes deck generation,
-		//keep commented out for now!
+		Scoreboard.S.score = ScoreManager.SCORE; 
 
 		deck = GetComponent<Deck> ();
 		deck.InitDeck (deckXML.text);
@@ -270,21 +306,44 @@ public class Prospector : MonoBehaviour {
 
 	void GameOver(bool won)
 	{
+		int score = ScoreManager.SCORE;
+		if (fsRun != null) score += fsRun.score;
 		if (won)
 		{
+			gameOverText.text = "Round Over";
+			roundResultText.text = "You won this round!\nRound Score: " + score;
+			ShowResultsUI(true);
 			//print("GameOver. You Won! :)");
 			ScoreManager.EVENT(eScoreEvent.gameWin);
             FloatingScoreHandler(eScoreEvent.gameWin);
         } else
 		{
+			gameOverText.text = "Game Over";
+			if(ScoreManager.HIGH_SCORE <= score)
+			{
+				string str = "You got the high score!\nHigh score: " + score; // why use a string
+				//instead of setting directly?
+				roundResultText.text = str;
+			}
+			else
+			{
+				roundResultText.text = "Your final score was: " + score;
+			}
+			ShowResultsUI(true);
 			//print("Gameover. You Lost! :(");
 			ScoreManager.EVENT(eScoreEvent.gameLoss);
             FloatingScoreHandler(eScoreEvent.gameLoss);
         }
 
 		//reload scene
-		SceneManager.LoadScene("__Prospector");
+		//SceneManager.LoadScene("__Prospector");
+		Invoke("ReloadLevel", reloadDelay);
 	}
+
+	void ReloadLevel()
+	{
+        SceneManager.LoadScene("__Prospector");
+    }
 	public bool AdjacentRank(CardProspector c0, CardProspector c1)
 	{
 		if(!c0.faceUp || !c1.faceUp) return(false);

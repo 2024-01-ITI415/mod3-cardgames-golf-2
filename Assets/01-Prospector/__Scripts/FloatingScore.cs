@@ -31,7 +31,7 @@ public class FloatingScore : MonoBehaviour
         set
         {
             _score = value;
-            scoreString = _score.ToString("NO");//NO adds commas to the num
+            scoreString = _score.ToString("N0");//NO adds commas to the num
             //ToString formats at C# Standard Numeric Format Strings
             GetComponent<Text>().text = scoreString;
         }
