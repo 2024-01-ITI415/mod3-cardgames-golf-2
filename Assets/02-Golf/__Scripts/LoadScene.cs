@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class LoadScene : MonoBehaviour
+namespace Golf
 {
-    public void loadProspector()
+    public class LoadScene : MonoBehaviour
     {
-        SceneManager.LoadScene("__Prospector");
+        public void loadGolf()
+        {
+            SceneManager.LoadScene("__Golf");
+        }
     }
 }
