@@ -9,4 +9,9 @@ public class LoadScene : MonoBehaviour
     {
         SceneManager.LoadScene("__Prospector");
     }
+
+    public void loadGolf()
+    {
+        SceneManager.LoadScene("__Golf");
+    }
 }
